@@ -1,59 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+  <head>
+    <title>Restaurant Website</title>
+  </head>
+  <body>
+    <h1>Welcome to Dewakar ka dhaba!</h1>
+    <div id="menu"></div>
+    <button id="order-btn"  style="background-color:aliceblue">Place Order</button>
+    <script>
+      // Define functions
+      async function getMenu() {
+        const response = await fetch("https://raw.githubusercontent.com/saksham-accio/f2_contest_3/main/food.json");
+        const data = await response.json();
+        const menu = document.getElementById("menu");
+        data.forEach((item) => {
+          menu.innerHTML += `
+            <div>
+              <h2>${item.name}</h2>
+              <p><img src="${item.imgSrc}" alt="${item.imageAlt}" width="50%"></p>
+              <p>${item.price}</p>
+            </div>
+          `;
+        });
+      }
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F2 contest 2</title>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="./index.css">
-</head>
+      function takeOrder() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            const burgers = ["Cheeseburger", "Veggie Burger", "Chicken Burger"];
+            const order = {
+              burgers: [burgers[Math.floor(Math.random() * 3)], burgers[Math.floor(Math.random() * 3)], burgers[Math.floor(Math.random() * 3)]]
+            };
+            resolve(order);
+          }, 2500);
+        });
+      }
 
-<body>
+      function orderPrep() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve({order_status: true, paid: false});
+          }, 1500);
+        });
+      }
 
-    <p>Filter UI cards via their Profession.</p>
+      function payOrder() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve({order_status: true, paid: true});
+          }, 1000);
+        });
+      }
 
-    <div>
-        <select id="profession">
-        <option value="">Profession<i class='bx bx-chevron-down'></i></option>
-        <option value="Developer">Developer</option>
-        <option value="Admin">Admin</option>
-        </select>
-    </div>
-    <!-- array container -->
-    <div id="users-container"></div>
+      function thankyouFnc() {
+        alert("Thank you for eating with us today!");
+      }
 
+      // Attach event listener to order button
+      const orderBtn = document.getElementById("order-btn");
+      orderBtn.addEventListener("click", async () => {
+        try {
+          const order = await takeOrder();
+          console.log("Order placed: ", order);
 
-    <!-- after filter this should filter according to the project idea -->
-    <button id="filter-btn">Filter</button>
+          const orderStatus = await orderPrep();
+          console.log("Order status: ", orderStatus);
 
-    <p>Add a new user</p>
+          const payment = await payOrder();
+          console.log("Payment status: ", payment);
 
-    <div class="flex">
-        <section>
-            <label for="name"> Enter Name</label>
-            <input type="text" id="name">
-        </section>
-        <section>
-            <label for="profession"> Enter Profession</label>
-            <input type="text" id="profession-input">
-        </section>
-        <section>
-            <label for="age"> Enter Age</label>
-            <input type="number" id="age">
-        </section>
-    </div>
-    <button id="add-btn">Add User</button>
+          if (payment.paid) {
+            thankyouFnc();
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      });
 
-
-    <footer>
-        &copy; Dewakar Chaubey 2023
-    </footer>
-
-
-    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
-    <script src="./index.js"></script>
-</body>
-
+      // Call getMenu function on page load
+      getMenu();
+    </script>
+  </body>
 </html>
